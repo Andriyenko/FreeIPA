@@ -413,6 +413,7 @@ FreeIPA сервер:
 * /var/log/pki-ca/debug
 * /var/log/pki-ca-install.log #Журнал установки Центра Сертификации DogTag CA
 * /var/log/messages
+  
 FreeIPA client logs:
 * /var/log/sssd/*.log: SSSD logs
 * /var/log/audit/audit.log: user login attempts
