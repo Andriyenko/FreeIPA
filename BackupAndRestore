@@ -1,0 +1,130 @@
+## Backup and Restore
+У севера IdM есть два резервной копии:
+* Full-IdM server backup - резервная копия всех файлов сервера IdM, а также данных LDAP. Выполняется только после остановки всех служб IdM
+  
+```
+ipa-backup --logs
+```
+  
+* Data-only Backup - создает только резервную копию данных LDAP и журнала изменений. Может выполняться онлайн и оффлайн
+  
+```
+ipa-backup --data --logs
+```
+  
+Бэкапы храняться **/var/lib/ipa/backup/
+  
+! Если заканчивается место на диске в директории /tmp, можно изменить место хранения временнных  файлов 
+TMPDIR=/path/to/backup ipa-backup
+  
+Резервную копию можно восстановить только на том сервере, где она была сделана. Перед полным восстановлением рекомендуется удалить IdM
+```
+ipa-restore /path/to/backup
+```
+  
+После восстановления из резервной копии, требуется почистить кэш SSSD и перезагрузить систему:
+```
+systemctl stop sssd
+find /var/lib/sss/ ! -type d | xargs rm -f
+systemctl start sssd
+reboot
+```
+  
+При создании резервной копии используются файлы и директории:
+  
+Directories:
+```
+/usr/share/ipa/html
+/root/.pki
+/etc/pki-ca
+/etc/pki/pki-tomcat
+/etc/sysconfig/pki
+/etc/httpd/alias
+/var/lib/pki
+/var/lib/pki-ca
+/var/lib/ipa/sysrestore
+/var/lib/ipa-client/sysrestore
+/var/lib/ipa/dnssec
+/var/lib/sss/pubconf/krb5.include.d/
+/var/lib/authconfig/last
+/var/lib/certmonger
+/var/lib/ipa
+/var/run/dirsrv
+/var/lock/dirsrv
+```
+  
+Files:
+```
+/etc/named.conf
+/etc/named.keytab
+/etc/resolv.conf
+/etc/sysconfig/pki-ca
+/etc/sysconfig/pki-tomcat
+/etc/sysconfig/dirsrv
+/etc/sysconfig/ntpd
+/etc/sysconfig/krb5kdc
+/etc/sysconfig/pki/ca/pki-ca
+/etc/sysconfig/ipa-dnskeysyncd
+/etc/sysconfig/ipa-ods-exporter
+/etc/sysconfig/named
+/etc/sysconfig/ods
+/etc/sysconfig/authconfig
+/etc/ipa/nssdb/pwdfile.txt
+/etc/pki/ca-trust/source/ipa.p11-kit
+/etc/pki/ca-trust/source/anchors/ipa-ca.crt
+/etc/nsswitch.conf
+/etc/krb5.keytab
+/etc/sssd/sssd.conf
+/etc/openldap/ldap.conf
+/etc/security/limits.conf
+/etc/httpd/conf/password.conf
+/etc/httpd/conf/ipa.keytab
+/etc/httpd/conf.d/ipa-pki-proxy.conf
+/etc/httpd/conf.d/ipa-rewrite.conf
+/etc/httpd/conf.d/nss.conf
+/etc/httpd/conf.d/ipa.conf
+/etc/ssh/sshd_config
+/etc/ssh/ssh_config
+/etc/krb5.conf
+/etc/ipa/ca.crt
+/etc/ipa/default.conf
+/etc/dirsrv/ds.keytab
+/etc/ntp.conf
+/etc/samba/smb.conf
+/etc/samba/samba.keytab
+/root/ca-agent.p12
+/root/cacert.p12
+/var/kerberos/krb5kdc/kdc.conf
+/etc/systemd/system/multi-user.target.wants/ipa.service
+/etc/systemd/system/multi-user.target.wants/sssd.service
+/etc/systemd/system/multi-user.target.wants/certmonger.service
+/etc/systemd/system/pki-tomcatd.target.wants/pki-tomcatd@pki-tomcat.service
+/var/run/ipa/services.list
+/etc/opendnssec/conf.xml
+/etc/opendnssec/kasp.xml
+/etc/ipa/dnssec/softhsm2.conf
+/etc/ipa/dnssec/softhsm_pin_so
+/etc/ipa/dnssec/ipa-ods-exporter.keytab
+/etc/ipa/dnssec/ipa-dnskeysyncd.keytab
+/etc/idm/nssdb/cert8.db
+/etc/idm/nssdb/key3.db
+/etc/idm/nssdb/secmod.db
+/etc/ipa/nssdb/cert8.db
+/etc/ipa/nssdb/key3.db
+/etc/ipa/nssdb/secmod.db
+Log files and directories:
+/var/log/pki-ca
+/var/log/pki/
+/var/log/dirsrv/slapd-PKI-IPA
+/var/log/httpd
+/var/log/ipaserver-install.log
+/var/log/kadmind.log
+/var/log/pki-ca-install.log
+/var/log/messages
+/var/log/ipaclient-install.log
+/var/log/secure
+/var/log/ipaserver-uninstall.log
+/var/log/pki-ca-uninstall.log
+/var/log/ipaclient-uninstall.log
+/var/named/data/named.run
+```
